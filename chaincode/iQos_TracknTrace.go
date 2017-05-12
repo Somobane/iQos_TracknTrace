@@ -100,7 +100,7 @@ func (t *TnT) Init(stub shim.ChaincodeStubInterface, function string, args []str
 }
 //API to create an assembly
 func (t *TnT) createAssembly(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-if len(args) != 3 {
+if len(args) != 4 {
 			return nil, fmt.Errorf("Incorrect number of arguments. Expecting 11. Got: %d.", len(args))
 		}
 
@@ -110,9 +110,10 @@ if len(args) != 3 {
 		//Generate the AssemblyId
 		rand.Seed(time.Now().Unix())
 		
-		_assemblyId := strconv.Itoa(rand.Int())
-		_deviceSerialNo:= args[0]
-		_deviceType:=args[1]
+		//_assemblyId := strconv.Itoa(rand.Int())
+		_assemblyId := "2345678901"
+		_deviceSerialNo:= args[1]
+		_deviceType:=args[2]
 		//_FilamentBatchId:=args[2]
 		//_LedBatchId:=args[3]
 		//_CircuitBoardBatchId:=args[4]
@@ -121,7 +122,7 @@ if len(args) != 3 {
 		//_AdaptorBatchId:=args[7]
 		//_StickPodBatchId:=args[8]
 		//_ManufacturingPlant:=args[9]
-		_AssemblyStatus:= args[2]
+		_AssemblyStatus:= args[0]
 
 		_time:= time.Now().Local()
 
