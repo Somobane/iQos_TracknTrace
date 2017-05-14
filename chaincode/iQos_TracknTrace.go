@@ -22,7 +22,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"math/rand"
 	"time"
 	"strconv"
 	
@@ -85,7 +84,7 @@ func (t *TnT) Init(stub shim.ChaincodeStubInterface, function string, args []str
 		return nil, errors.New("Expecting integer value ")
 	}
 	// Write the state to the ledger
-	err = stub.PutState("Assembly_Test", []byte(strconv.Itoa(_temp)))				
+	err = stub.PutState("12345678", []byte(strconv.Itoa(_temp)))				
 	if err != nil {
 		return nil, err
 	}
@@ -108,10 +107,10 @@ if len(args) != 4 {
 		//_assemblyId:= rand.New(rand.NewSource(99)).Int31
 
 		//Generate the AssemblyId
-		rand.Seed(time.Now().Unix())
+		//rand.Seed(time.Now().Unix())
 		
 		//_assemblyId := strconv.Itoa(rand.Int())
-		_assemblyId := "2345678901"
+		_assemblyId := args[0]
 		_deviceSerialNo:= args[1]
 		_deviceType:=args[2]
 		//_FilamentBatchId:=args[2]
@@ -130,15 +129,30 @@ if len(args) != 4 {
 		_AssemblyLastUpdateOn := _time.Format("2006-01-02")
 		//_AssemblyCreatedBy := ""
 		//_AssemblyLastUpdatedBy := ""
+
+	//check if marble already exists
+		assemblyAsBytes, err := stub.GetState(_assemblyId)
+		if err != nil {
+		return nil, errors.New("Failed to get assembly Id")
+		}
+		res := AssemblyLine{}
+		json.Unmarshal(assemblyAsBytes, &res)
+		if res.AssemblyId == _assemblyId{
+		fmt.Println("This Assembly arleady exists: " + _assemblyId)
+		fmt.Println(res);
+		return nil, errors.New("This Assembly arleady exists")				//all stop an Assembly already exists
+		}
+
+
 		str := `{"assemblyId": "` + _assemblyId + `", "deviceSerialNo": "` + _deviceSerialNo + `", "deviceType": "` + _deviceType + `", "assemblyStatus": "`+ _AssemblyStatus +`", "assemblyLastUpdateOn": "` + _AssemblyLastUpdateOn + `"}`
 		
-		err := stub.PutState(_assemblyId, []byte(str))								//store assembly with id as key
+		err = stub.PutState(_assemblyId, []byte(str))								//store assembly with id as key
 		if err != nil {
 		return nil, err
 		}
 
 		//get the assembly index
-		assemblyAsBytes, err := stub.GetState(assemblyIndexStr)
+		assemblyAsBytes, err = stub.GetState(assemblyIndexStr)
 		if err != nil {
 			return nil, errors.New("Failed to get assembly index")
 		}
